@@ -7,7 +7,7 @@
 #include "config.h"
 
 static gboolean signal_handler(gpointer user_data) {
-	GMainLoop *loop = (GMainLoop *)user_data;
+	GMainLoop *loop = user_data;
 
 	g_log_structured(G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, "MESSAGE", "SIGTERM/SIGINT received, stopping main loop...");
 
@@ -29,7 +29,7 @@ int main()
 	g_unix_signal_add(SIGTERM, signal_handler, loop);
 
 	// Init GPIO lib (WiringOP)
-	if (wiringPiSetupGpio() == -1) {
+	if (gpio_init() != 0) {
 		g_log_structured(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "MESSAGE", "Failed to init GPIO library");
 		return 1;
 	}
@@ -51,6 +51,7 @@ int main()
 
 	// ===== Cleanup
 	config_clear(&app_config_CB.config);
+	gpio_deinit();
 	// =====
 
 	return 0;

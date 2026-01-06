@@ -69,14 +69,14 @@ gboolean monitor_temp_task(gpointer data) {
 
         if (state->current_temp > state->zone->temp_max && state->reaction == CONTROL_ZONE_REACTION_NONE) {
             state->reaction = CONTROL_ZONE_REACTION_GPIO_ENABLED;
-            digitalWrite(state->zone->pin, HIGH);
+            gpio_write(state->zone, TRUE);
 
             g_log_structured(G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, "MESSAGE", "Temperature threshold exceeded, reaction completed",
                 "CONTROL_ZONE", state->zone->id);
 
         } else if (state->current_temp <= state->zone->temp_min && state->reaction == CONTROL_ZONE_REACTION_GPIO_ENABLED) {
             state->reaction = CONTROL_ZONE_REACTION_NONE;
-            digitalWrite(state->zone->pin, LOW);
+            gpio_write(state->zone, FALSE);
 
             g_log_structured(G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, "MESSAGE", "Temperature reduction to the required level detected, reaction completed",
                 "CONTROL_ZONE", state->zone->id);

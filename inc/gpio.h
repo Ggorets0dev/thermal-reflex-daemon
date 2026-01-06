@@ -4,10 +4,14 @@
 #include "config.h"
 
 /*
- * GPIO outputs are controlled using the WiringOP library, which is installed on the system.
+ * GPIO outputs are controlled using the libgpiod library, which is installed on the system.
  */
 
-#include "wiringPi.h"
+int gpio_init(void);
+
+void gpio_deinit(void);
+
+void gpio_write(const control_zone_t* zone, const uint8_t value);
 
 void set_pins_modes(const GArray* control_zones);
 
