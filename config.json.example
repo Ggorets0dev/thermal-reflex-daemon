@@ -6,7 +6,7 @@
                 "type": "GPIO",
                 "temp_max": 55.0,
                 "temp_min": 50.0,
-                "pin": "PC11"
+                "pin": "PC11",
                 "path": "/sys/class/thermal/thermal_zone2"
             }
         ]
