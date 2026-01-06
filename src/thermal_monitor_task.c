@@ -1,7 +1,6 @@
-#include "thermal_monitor_task.h"
-
 #include <stdio.h>
 
+#include "thermal_monitor_task.h"
 #include "config.h"
 #include "gpio.h"
 #include "log.h"

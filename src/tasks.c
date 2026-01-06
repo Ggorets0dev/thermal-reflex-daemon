@@ -1,8 +1,8 @@
 #include <sys/stat.h>
-#include "tasks.h"
-
 #include <systemd/sd-daemon.h>
 
+#include "tasks.h"
+#include "log.h"
 #include "thermal_monitor_task.h"
 
 #define TASKS_COUNT     (2)
@@ -30,6 +30,8 @@ void init_tasks(void) {
         app_tasks[0].period_ms = usec / (1000 * 2);
         app_tasks[0].arg = NULL;
         app_tasks[0].is_initialized = true;
+
+        g_log_structured(G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, "MESSAGE", "WatchDog task initialized");
     }
     // =======
 
@@ -38,6 +40,8 @@ void init_tasks(void) {
     app_tasks[1].period_ms = 1000;
     app_tasks[1].arg = &app_config_CB;
     app_tasks[1].is_initialized = true;
+
+    g_log_structured(G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, "MESSAGE", "ThermalMonitor task initialized");
     // =======
 }
 
