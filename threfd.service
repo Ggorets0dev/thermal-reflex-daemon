@@ -1,0 +1,15 @@
+[Unit]
+Description=Demon of temperature control in zones, with subsequent reaction
+After=syslog.target
+
+[Service]
+Type=notify
+ExecStart=/usr/local/bin/threfd
+Restart=always
+TimeoutStopSec=10s
+WatchdogSec=10s
+MemoryMax=32M
+CPUQuota=20%
+
+[Install]
+WantedBy=multi-user.target
