@@ -1,6 +1,7 @@
 #ifndef TASKS_H
 #define TASKS_H
 
+#include <stdbool.h>
 #include "glib.h"
 #include "config.h"
 
