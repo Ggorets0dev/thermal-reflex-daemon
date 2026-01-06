@@ -3,7 +3,7 @@
 Software written in C (standard 23) to monitor and respond to temperature on single-board computers.
 
 <p align="center">
-    <img src="img/threfd_logo.png" width="200" height="200" alt="Logo">
+    <img src="img/threfd_logo.png" width="400" height="400" alt="Logo">
 </p>
 
 ## Build
