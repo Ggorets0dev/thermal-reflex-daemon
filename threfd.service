@@ -1,5 +1,5 @@
 [Unit]
-Description=Demon of temperature control in zones, with subsequent reaction
+Description=Daemon of temperature control in zones, with subsequent reaction
 After=syslog.target
 
 [Service]
