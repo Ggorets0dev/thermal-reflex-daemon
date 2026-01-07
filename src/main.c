@@ -30,6 +30,7 @@ int main()
 
 	// Init GPIO lib (WiringOP)
 	if (gpio_init() != 0) {
+		gpio_deinit(); // Deinit fields, which may be initialized successfully
 		g_log_structured(G_LOG_DOMAIN, G_LOG_LEVEL_CRITICAL, "MESSAGE", "Failed to init GPIO library");
 		return 1;
 	}

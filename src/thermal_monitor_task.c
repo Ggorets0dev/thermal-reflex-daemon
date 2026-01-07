@@ -39,9 +39,8 @@ static float get_temp_from_zone(const control_zone_t* zone) {
         return 1;
     }
 
-    if (fscanf(file, "%d", &temp) == 1) {
-
-    } else {
+    if (fscanf(file, "%d", &temp) != 1) {
+        temp = 0;
         g_log_structured(G_LOG_DOMAIN, G_LOG_LEVEL_WARNING, "MESSAGE", "Failed to read temperature for control zone");
     }
 
@@ -62,25 +61,31 @@ gboolean monitor_temp_task(gpointer data) {
         init_zones_states(config);
     }
 
-    // Parse temp for all zones and apply reaction if needed
+    // Parse temp for all zones and vote reaction if needed
     for (size_t i = 0; i < app_ctrl_zones_states->len; i++) {
         control_zone_state_t* state = &g_array_index(app_ctrl_zones_states, control_zone_state_t, i);
         state->current_temp = get_temp_from_zone(state->zone);
 
         if (state->current_temp > state->zone->temp_max && state->reaction == CONTROL_ZONE_REACTION_NONE) {
             state->reaction = CONTROL_ZONE_REACTION_GPIO_ENABLED;
-            gpio_write(state->zone, TRUE);
+            gpio_vote(state->zone->pin, GPIO_VOTE_INCREMENT);
 
             g_log_structured(G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, "MESSAGE", "Temperature threshold exceeded, reaction completed",
                 "CONTROL_ZONE", state->zone->id);
 
         } else if (state->current_temp <= state->zone->temp_min && state->reaction == CONTROL_ZONE_REACTION_GPIO_ENABLED) {
             state->reaction = CONTROL_ZONE_REACTION_NONE;
-            gpio_write(state->zone, FALSE);
+            gpio_vote(state->zone->pin, GPIO_VOTE_DECREMENT);
 
             g_log_structured(G_LOG_DOMAIN, G_LOG_LEVEL_MESSAGE, "MESSAGE", "Temperature reduction to the required level detected, reaction completed",
                 "CONTROL_ZONE", state->zone->id);
         }
+    }
+
+    // Apply votes after full collect
+    for (size_t i = 0; i < app_ctrl_zones_states->len; i++) {
+        const control_zone_state_t* state = &g_array_index(app_ctrl_zones_states, control_zone_state_t, i);
+        gpio_apply_vote(state->zone->pin);
     }
 
     return G_SOURCE_CONTINUE;
