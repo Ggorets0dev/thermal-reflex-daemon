@@ -1,0 +1,12 @@
+PROJECT_NAME            = "Thermal Reflex Daemon"
+INPUT                  = inc src
+RECURSIVE              = YES
+OUTPUT_DIRECTORY       = doc
+HTML_OUTPUT            = html
+GENERATE_LATEX         = NO
+GENERATE_RTF           = NO
+GENERATE_XML           = NO
+GENERATE_MAN           = NO
+GENERATE_HTML          = YES
+INPUT_ENCODING         = UTF-8
+EXTRACT_ALL            = YES

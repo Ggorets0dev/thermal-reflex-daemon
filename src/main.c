@@ -6,6 +6,11 @@
 #include "gpio.h"
 #include "config.h"
 
+/**
+ * @brief SIGTERM/SIGINT handler for loop stopping
+ * @param user_data Pointer to arg
+ * @return State of handler
+ */
 static gboolean signal_handler(gpointer user_data) {
 	GMainLoop *loop = user_data;
 

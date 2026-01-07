@@ -8,7 +8,13 @@
 
 threfd_config_ctrl_block_t app_config_CB;
 
-int parse_sunxi_gpio(const char *pin_str, uint8_t* pin_out) {
+/**
+ * @brief Parse sunix GPIO from string
+ * @param pin_str String with pin
+ * @param pin_out Pin to fill with parsed value
+ * @return State of parsing (0 - success)
+ */
+static int parse_sunxi_gpio(const char *pin_str, uint8_t* pin_out) {
     if (!pin_str || (pin_str[0] != 'P' && pin_str[0] != 'p')) {
         return 1;
     }
@@ -25,6 +31,11 @@ int parse_sunxi_gpio(const char *pin_str, uint8_t* pin_out) {
     return 0;
 }
 
+/**
+ * @brief Parse control zone type from string
+ * @param type String with type
+ * @return Control zone type
+ */
 static control_zone_type_e parse_control_zone_type(const char* type) {
     if (strcmp(type, "GPIO") == 0) {
         return CONTROL_ZONE_TYPE_GPIO;

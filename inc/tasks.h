@@ -5,6 +5,9 @@
 #include "glib.h"
 #include "config.h"
 
+/**
+ * @brief Control block for task
+*/
 typedef struct task_control_block {
     gboolean (*core)(gpointer data);
     gpointer arg;
@@ -12,6 +15,9 @@ typedef struct task_control_block {
     bool is_initialized;
 } task_control_block_t;
 
+/**
+ * @brief Add all tasks to event loop
+*/
 void add_tasks_to_loop(void);
 
 #endif //TASKS_H

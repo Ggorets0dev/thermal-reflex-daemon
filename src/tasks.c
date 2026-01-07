@@ -5,16 +5,30 @@
 #include "log.h"
 #include "thermal_monitor_task.h"
 
+/**
+ * @brief Count of tasks in main event loop
+ */
 #define TASKS_COUNT     (2)
 
 // ==============
 // Static variables
 // ==============
+/**
+ * @brief Control blocks for all tasks
+ */
 static task_control_block_t app_tasks[TASKS_COUNT];
 // ==============
 
+/**
+ * @brief Init task's control blocks
+ */
 void init_tasks(void) __attribute__((constructor));
 
+/**
+ * @brief Watchdog task (systemd)
+ * @param data Pointer to arg
+ * @return Status of task (glib)
+ */
 static gboolean watch_dog_task(gpointer data __attribute__((unused))) {
     sd_notify(0, "WATCHDOG=1");
     return G_SOURCE_CONTINUE;

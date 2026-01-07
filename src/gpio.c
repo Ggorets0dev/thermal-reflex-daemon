@@ -2,16 +2,33 @@
 #include "gpio.h"
 #include "log.h"
 
+/**
+ * @brief Chip for GPIO lines (usually, user pins are in chip1 in OP)
+ */
 #define GPIO_CHIP_PATH      ("/dev/gpiochip1")
 
+/**
+ * @brief GPIO pin inner state
+ */
 typedef struct {
     struct gpiod_line* line;
     uint8_t vote_counter;
 } gpio_pin_state_t;
 
-static GHashTable *app_gpio_zone_map;
+/**
+ * @brief GPIO map for control pins states
+ */
+static GHashTable *app_gpio_pin_map;
+
+/**
+ * @brief GPIO chip instance
+ */
 static struct gpiod_chip* app_gpio_chip;
 
+/**
+ * @brief Destructor for GPIO pins states
+ * @param data Pin state
+ */
 static void pin_state_free(gpointer data) {
     // Clear inner fields
     gpio_pin_state_t* state = data;
@@ -20,8 +37,12 @@ static void pin_state_free(gpointer data) {
     g_free(state);
 }
 
+/**
+ * @brief Register pin in lib (gpiod) and create state struct
+ * @param pin GPIO pin
+ */
 static void reg_pin(const int pin) {
-    if (g_hash_table_contains(app_gpio_zone_map, GINT_TO_POINTER(pin))) {
+    if (g_hash_table_contains(app_gpio_pin_map, GINT_TO_POINTER(pin))) {
         return;
     }
 
@@ -36,23 +57,23 @@ static void reg_pin(const int pin) {
     if (status == 0) {
         state->vote_counter = 0;
         state->line = line;
-        g_hash_table_insert(app_gpio_zone_map, GINT_TO_POINTER(pin), state);
+        g_hash_table_insert(app_gpio_pin_map, GINT_TO_POINTER(pin), state);
     }
 }
 
 int gpio_init(void) {
-    app_gpio_zone_map = g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL, pin_state_free);
+    app_gpio_pin_map = g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL, pin_state_free);
     app_gpio_chip = gpiod_chip_open(GPIO_CHIP_PATH);
     return (app_gpio_chip != NULL) ? 0 : 1;
 }
 
 void gpio_deinit(void) {
-    if (app_gpio_zone_map)      g_hash_table_destroy(app_gpio_zone_map);
+    if (app_gpio_pin_map)      g_hash_table_destroy(app_gpio_pin_map);
     if (app_gpio_chip)          gpiod_chip_close(app_gpio_chip);
 }
 
-void gpio_write(const int pin, const uint8_t value) {
-    gpio_pin_state_t* state = g_hash_table_lookup(app_gpio_zone_map, GINT_TO_POINTER(pin));
+void gpio_write(const int pin, const bool value) {
+    gpio_pin_state_t* state = g_hash_table_lookup(app_gpio_pin_map, GINT_TO_POINTER(pin));
 
     if (state->line) {
         gpiod_line_set_value(state->line, value);
@@ -60,7 +81,7 @@ void gpio_write(const int pin, const uint8_t value) {
 }
 
 int gpio_read(const int pin) {
-    const gpio_pin_state_t* state = g_hash_table_lookup(app_gpio_zone_map, GINT_TO_POINTER(pin));
+    const gpio_pin_state_t* state = g_hash_table_lookup(app_gpio_pin_map, GINT_TO_POINTER(pin));
 
     if (state->line) {
         return gpiod_line_get_value(state->line);
@@ -70,7 +91,7 @@ int gpio_read(const int pin) {
 }
 
 void gpio_vote(const int pin, const gpio_vote_e vote) {
-    gpio_pin_state_t* state = g_hash_table_lookup(app_gpio_zone_map, GINT_TO_POINTER(pin));
+    gpio_pin_state_t* state = g_hash_table_lookup(app_gpio_pin_map, GINT_TO_POINTER(pin));
 
     if (state->line) {
         if (vote == GPIO_VOTE_DECREMENT && state->vote_counter > 0)     --state->vote_counter;
@@ -79,7 +100,7 @@ void gpio_vote(const int pin, const gpio_vote_e vote) {
 }
 
 void gpio_apply_vote(const int pin) {
-    const gpio_pin_state_t* state = g_hash_table_lookup(app_gpio_zone_map, GINT_TO_POINTER(pin));
+    const gpio_pin_state_t* state = g_hash_table_lookup(app_gpio_pin_map, GINT_TO_POINTER(pin));
 
     if (state->line) {
         const int pin_value = gpio_read(pin);

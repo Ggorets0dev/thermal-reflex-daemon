@@ -5,10 +5,20 @@
 #include "gpio.h"
 #include "log.h"
 
+/**
+ * @brief States of app control zones
+ */
 static GArray* app_ctrl_zones_states;
 
+/**
+ * @brief Deinit control zone's states
+ */
 static void deinit_zones_states(void) __attribute__((destructor));
 
+/**
+ * @brief Init control zone's states
+ * @param config App config
+ */
 static void init_zones_states(const threfd_config_t* config) {
     app_ctrl_zones_states = g_array_new(FALSE, TRUE, sizeof(control_zone_state_t));
 
@@ -24,6 +34,11 @@ static void init_zones_states(const threfd_config_t* config) {
     }
 }
 
+/**
+ * @brief Get temperature from Linux API
+ * @param zone Control zone
+ * @return Temp (Celsius)
+ */
 static float get_temp_from_zone(const control_zone_t* zone) {
     FILE *file = NULL;
     int temp = 0;
